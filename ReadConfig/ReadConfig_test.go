@@ -14,6 +14,7 @@ type GlobalConfigData struct {
 	ExampeWithDefault string `default:"dflt-1"`
 	SomePassword      string `default:"dflt-2"`
 	CheckDefault      string `default:"dflt-3"`
+	SomeFile          string `default:"hm"`
 }
 
 var gCfg GlobalConfigData // global configuration data.
@@ -25,18 +26,28 @@ func TestMineBlock(t *testing.T) {
 		SetEnvVal        string
 		FileName         string
 		ExpectedPassword string
+		ExpectedSomeFile string
 	}{
 		{
 			SetEnvName:       "MyPassword",
 			SetEnvVal:        "xyzzy-3",
 			FileName:         "../testdata/a.json",
 			ExpectedPassword: "xyzzy-3",
+			ExpectedSomeFile: "hm",
 		},
 		{
 			SetEnvName:       "Test2",
 			SetEnvVal:        "xyzzy-2",
 			FileName:         "../testdata/b.json",
 			ExpectedPassword: "xyzzy-2",
+			ExpectedSomeFile: "hm",
+		},
+		{
+			SetEnvName:       "MyPassword",
+			SetEnvVal:        "xyzzy-3",
+			FileName:         "../testdata/fn.json",
+			ExpectedPassword: "dflt-2",
+			ExpectedSomeFile: "bob bob bob\n",
 		},
 	}
 
@@ -65,6 +76,9 @@ func TestMineBlock(t *testing.T) {
 		}
 		if gCfg.CheckDefault != "dflt-3" {
 			t.Errorf("Test %d, expected %s got %s\n", ii, "dflt-3", gCfg.SomePassword)
+		}
+		if gCfg.SomeFile != test.ExpectedSomeFile {
+			t.Errorf("Test %d, expected ->%s<- got ->%s<-\n", ii, test.ExpectedSomeFile, gCfg.SomeFile)
 		}
 	}
 

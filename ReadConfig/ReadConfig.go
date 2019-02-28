@@ -236,6 +236,15 @@ func SetFromEnv(s interface{}) (err error) {
 				}
 				vfld.SetString(envVal)
 			}
+			if len(curVal) > 6 && curVal[0:6] == "$FILE$" {
+				data, err := ioutil.ReadFile(curVal[6:])
+				if db2 {
+					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, data, data)
+				}
+				if err != nil {
+				}
+				vfld.SetString(string(data))
+			}
 		}
 	}
 
