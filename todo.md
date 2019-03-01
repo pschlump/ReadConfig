@@ -6,3 +6,5 @@
 4. Nested Data - struct in struct, struct/map etc.
 5. Split out 'default" into SetValuesBasedOnDefaultTag
 
+1. with $FILE$ - should look for a "local" copy of it?
+

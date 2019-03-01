@@ -34,7 +34,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 
 	// Make sure we now have a struct
 	if typ.Kind() != reflect.Struct {
-		return fmt.Errorf("SetFromEnv was not passed a struct.\n")
+		return fmt.Errorf("ReadFile was not passed a struct.\n")
 	}
 
 	// Can we set values?
@@ -43,7 +43,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 			fmt.Printf("Debug: We can set values.\n")
 		}
 	} else {
-		return fmt.Errorf("SetFromEnv passed a struct that will not allow setting of values\n")
+		return fmt.Errorf("ReadFile passed a struct that will not allow setting of values\n")
 	}
 
 	// The number of fields in the struct is determined by the type of struct it is. Loop through them.
@@ -113,6 +113,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 
 	// look for filename in ~/local (C:\local on Winderz)
 	var home string
+	// If we are on Windows then pull from c:/, else use the home direcotry.
 	if os.PathSeparator == '/' {
 		home = os.Getenv("HOME")
 	} else {
@@ -142,8 +143,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 		os.Exit(1)
 	}
 
-	// err = SetFromEnv(&gCfg)
-	err = SetFromEnv(lCfg)
+	err = setFromEnv2(typ, val)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error pulling from environment: %s\n", err)
 		os.Exit(1)
@@ -156,6 +156,61 @@ func PrintErrorJson(js string, err error) (rv string) {
 	rv = jsonSyntaxErrorLib.GenerateSyntaxError(js, err)
 	fmt.Fprintf(os.Stderr, "%s\n", rv)
 	return
+}
+
+func setFromEnv2(typ reflect.Type, val reflect.Value) (err error) {
+
+	// The number of fields in the struct is determined by the type of struct
+	// it is. Loop through them.
+	for i := 0; i < typ.NumField(); i++ {
+
+		// Get the type of the field from the type of the struct. For a struct, you always get a StructField.
+		sfld := typ.Field(i)
+
+		// Get the type of the StructField, which is the type actually stored in that field of the struct.
+		tfld := sfld.Type
+
+		// Get the Kind of that type, which will be the underlying base type
+		// used to define the type in question.
+		kind := tfld.Kind()
+
+		// Get the value of the field from the value of the struct.
+		vfld := val.Field(i)
+
+		// Dump out what we've found
+		if db2 {
+			fmt.Printf("Debug: struct field %d: name %s type %s kind %s value %v\n", i, sfld.Name, tfld, kind, vfld)
+		}
+
+		// Is that field some kind of string, and is the value one we can set?
+		if kind == reflect.String && vfld.CanSet() {
+			if db2 {
+				fmt.Printf("Debug: Looking to set field %s\n", sfld.Name)
+			}
+			// Assign to it
+			curVal := fmt.Sprintf("%s", vfld)
+			if len(curVal) > 5 && curVal[0:5] == "$ENV$" {
+				envVal := os.Getenv(curVal[5:])
+				if db2 {
+					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, curVal, envVal)
+				}
+				vfld.SetString(envVal)
+			}
+			if len(curVal) > 6 && curVal[0:6] == "$FILE$" {
+				data, err := ioutil.ReadFile(curVal[6:])
+				if db2 {
+					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, data, data)
+				}
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error [%s] with file [%s] field name [%s]\n", err, curVal[6:], sfld.Name)
+					os.Exit(1)
+				}
+				vfld.SetString(string(data))
+			}
+		}
+	}
+
+	return nil
 }
 
 func SetFromEnv(s interface{}) (err error) {
@@ -199,56 +254,61 @@ func SetFromEnv(s interface{}) (err error) {
 		return fmt.Errorf("SetFromEnv passed a struct that will not allow setting of values\n")
 	}
 
-	// The number of fields in the struct is determined by the type of struct
-	// it is. Loop through them.
-	for i := 0; i < typ.NumField(); i++ {
+	// PJS - new
+	return setFromEnv2(typ, val)
 
-		// Get the type of the field from the type of the struct. For a struct, you always get a StructField.
-		sfld := typ.Field(i)
-
-		// Get the type of the StructField, which is the type actually stored in that field of the struct.
-		tfld := sfld.Type
-
-		// Get the Kind of that type, which will be the underlying base type
-		// used to define the type in question.
-		kind := tfld.Kind()
-
-		// Get the value of the field from the value of the struct.
-		vfld := val.Field(i)
-
-		// Dump out what we've found
-		if db2 {
-			fmt.Printf("Debug: struct field %d: name %s type %s kind %s value %v\n", i, sfld.Name, tfld, kind, vfld)
-		}
-
-		// Is that field some kind of string, and is the value one we can set?
-		// 1. Other tyeps (all ints, floats) - not just strings		xyzzy001-type
-		if kind == reflect.String && vfld.CanSet() {
-			if db2 {
-				fmt.Printf("Debug: Looking to set field %s\n", sfld.Name)
-			}
-			// Assign to it
-			curVal := fmt.Sprintf("%s", vfld)
-			if len(curVal) > 5 && curVal[0:5] == "$ENV$" {
-				envVal := os.Getenv(curVal[5:])
-				if db2 {
-					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, curVal, envVal)
-				}
-				vfld.SetString(envVal)
-			}
-			if len(curVal) > 6 && curVal[0:6] == "$FILE$" {
-				data, err := ioutil.ReadFile(curVal[6:])
-				if db2 {
-					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, data, data)
-				}
-				if err != nil {
-				}
-				vfld.SetString(string(data))
-			}
-		}
-	}
-
-	return nil
+	//old	// The number of fields in the struct is determined by the type of struct
+	//old	// it is. Loop through them.
+	//old	for i := 0; i < typ.NumField(); i++ {
+	//old
+	//old		// Get the type of the field from the type of the struct. For a struct, you always get a StructField.
+	//old		sfld := typ.Field(i)
+	//old
+	//old		// Get the type of the StructField, which is the type actually stored in that field of the struct.
+	//old		tfld := sfld.Type
+	//old
+	//old		// Get the Kind of that type, which will be the underlying base type
+	//old		// used to define the type in question.
+	//old		kind := tfld.Kind()
+	//old
+	//old		// Get the value of the field from the value of the struct.
+	//old		vfld := val.Field(i)
+	//old
+	//old		// Dump out what we've found
+	//old		if db2 {
+	//old			fmt.Printf("Debug: struct field %d: name %s type %s kind %s value %v\n", i, sfld.Name, tfld, kind, vfld)
+	//old		}
+	//old
+	//old		// Is that field some kind of string, and is the value one we can set?
+	//old		// 1. Other tyeps (all ints, floats) - not just strings		xyzzy001-type
+	//old		if kind == reflect.String && vfld.CanSet() {
+	//old			if db2 {
+	//old				fmt.Printf("Debug: Looking to set field %s\n", sfld.Name)
+	//old			}
+	//old			// Assign to it
+	//old			curVal := fmt.Sprintf("%s", vfld)
+	//old			if len(curVal) > 5 && curVal[0:5] == "$ENV$" {
+	//old				envVal := os.Getenv(curVal[5:])
+	//old				if db2 {
+	//old					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, curVal, envVal)
+	//old				}
+	//old				vfld.SetString(envVal)
+	//old			}
+	//old			if len(curVal) > 6 && curVal[0:6] == "$FILE$" {
+	//old				data, err := ioutil.ReadFile(curVal[6:])
+	//old				if db2 {
+	//old					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, data, data)
+	//old				}
+	//old				if err != nil {
+	//old					fmt.Fprintf(os.Stderr, "Error [%s] with file [%s] field name [%s]\n", err, curVal[6:], sfld.Name)
+	//old					os.Exit(1)
+	//old				}
+	//old				vfld.SetString(string(data))
+	//old			}
+	//old		}
+	//old	}
+	//old
+	//old	return nil
 }
 
 // Exists returns true if a directory or file exists.
