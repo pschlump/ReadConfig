@@ -7,10 +7,31 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"strconv"
 
 	"github.com/fatih/structtag"
 	"github.com/pschlump/jsonSyntaxErrorLib"
 )
+
+//// TODO - TODO - add in recursive setting - xyzzy0001
+/*
+	case reflect.Struct:
+            walk(field.Interface(), fn)
+	https://quii.gitbook.io/learn-go-with-tests/go-fundamentals/reflection
+		-- Has code for walk of Strtuct/Array/Map etc.
+		-- Would need "set" capability
+	https://medium.freecodecamp.org/a-practical-example-go-reflections-and-generic-designs-4868b6cdb2dc
+	https://gist.github.com/tkrajina/880eb4b9a10aee28707e2aa764257503
+
+	1. Validation of Fields (stings/dates etc)
+	2. Default values
+	3. Pull in ENV
+	4. $PROMPT$ - pull in password from STDIN/quite
+	5. Change $ENV$ and $FILE$ into "tag" `env:"EnvName"` `file:"FileName"` `prompt:"PromptTag","password"`
+	6. Use of tags allow setting of int/int32/int64 etc.
+
+	1. Create a "ConfigureProgram" package.
+*/
 
 // ReadFile will read a configuration file into the global configuration structure.
 func ReadFile(filename string, lCfg interface{}) (err error) {
@@ -21,8 +42,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 
 	// Requries that lCfg is a pointer.
 	if ptyp.Kind() != reflect.Ptr {
-		fmt.Fprintf(os.Stderr, "Must pass a address of a struct to RedFile\n")
-		os.Exit(1)
+		return fmt.Errorf("Must pass a address of a struct to RedFile")
 	}
 
 	var typ reflect.Type
@@ -34,7 +54,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 
 	// Make sure we now have a struct
 	if typ.Kind() != reflect.Struct {
-		return fmt.Errorf("ReadFile was not passed a struct.\n")
+		return fmt.Errorf("ReadFile was not passed a struct.")
 	}
 
 	// Can we set values?
@@ -43,7 +63,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 			fmt.Printf("Debug: We can set values.\n")
 		}
 	} else {
-		return fmt.Errorf("ReadFile passed a struct that will not allow setting of values\n")
+		return fmt.Errorf("ReadFile passed a struct that will not allow setting of values")
 	}
 
 	// The number of fields in the struct is determined by the type of struct it is. Loop through them.
@@ -66,8 +86,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 		// ... and start using structtag by parsing the tag
 		tags, err := structtag.Parse(tag)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to parse structure tag ->%s<- %s\n", tag, err)
-			os.Exit(1)
+			return fmt.Errorf("Unable to parse structure tag ->%s<- %s", tag, err)
 		}
 
 		// Dump out what we've found
@@ -104,11 +123,49 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 				}
 				vfld.SetString(defaultValue)
 			}
-		} else if kind != reflect.String && err == nil {
+			//		} else if kind != reflect.String && err == nil {
+			//			// report errors - defauilt is only implemented with strings.
+			//			return fmt.Errorf("default tag on struct is only implemented for String fields that are settable in struct.  Fatal error on %s tag %s", sfld.Name, tag)
+		} else if kind == reflect.Int && vfld.CanSet() {
+			if err != nil || defaultTag.Name == "" {
+				// Ignore error - indicates no "default" tag set.
+			} else {
+				defaultValueStr := defaultTag.Name
+				defaultValue, err := strconv.ParseInt(defaultValueStr, 10, 64)
+				if err != nil {
+					return fmt.Errorf("Attempt to set default int value, invalid int ->%s<-, error [%s]", defaultValueStr, err)
+				}
+				if db1 {
+					fmt.Printf("Debug: Looking to set field %s to a default value of ->%v<-\n", sfld.Name, defaultValue)
+				}
+				vfld.SetInt(defaultValue)
+			}
+		} else if kind == reflect.Bool && vfld.CanSet() {
+			if err != nil || defaultTag.Name == "" {
+				// Ignore error - indicates no "default" tag set.
+			} else {
+				defaultValueStr := defaultTag.Name
+				defaultValue, err := strconv.ParseBool(defaultValueStr)
+				if err != nil {
+					return fmt.Errorf("Attempt to set default int value, invalid int ->%s<-, error [%s]", defaultValueStr, err)
+				}
+				if db1 {
+					fmt.Printf("Debug: Looking to set field %s to a default value of ->%v<-\n", sfld.Name, defaultValue)
+				}
+				vfld.SetBool(defaultValue)
+			}
+		} else if err == nil {
 			// report errors - defauilt is only implemented with strings.
-			fmt.Fprintf(os.Stderr, "default tag on struct is only implemented for String fields that are settable in struct.  Fatal error on %s tag %s\n", sfld.Name, tag)
+			fmt.Fprintf(os.Stderr, "default tag on struct is only implemented for String fields in struct.  Fatal error on %s tag %s\n", sfld.Name, tag)
 			os.Exit(1)
 		}
+
+		// TODO - TODO - other types - xyzzy0001
+		// } else if kind == reflect.Struct && ...
+		// } else if kind == Pointers?
+		// } else if kind == Maps?
+		// } else if kind == Array?
+		// } else if kind == Slice?
 	}
 
 	// look for filename in ~/local (C:\local on Winderz)
@@ -131,22 +188,20 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 	var buf []byte
 	buf, err = ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to read the JSON file [%s]: error %s\n", filename, err)
-		os.Exit(1)
+		return fmt.Errorf("Unable to read the JSON file [%s]: error %s", filename, err)
 	}
 
 	// err = json.Unmarshal(buf, &gCfg)
 	err = json.Unmarshal(buf, lCfg)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Invalid initialization - Unable to parse JSON file, %s\n", err)
-		PrintErrorJson(string(buf), err) // show line for error
-		os.Exit(1)
+		msg := PrintErrorJson(string(buf), err) // show line for error
+		return fmt.Errorf("Invalid initialization - Unable to parse JSON file, %s %s", err, msg)
 	}
 
 	err = setFromEnv2(typ, val)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error pulling from environment: %s\n", err)
-		os.Exit(1)
+		return fmt.Errorf("Error pulling from environment: %s", err)
 	}
 
 	return err
@@ -202,12 +257,17 @@ func setFromEnv2(typ reflect.Type, val reflect.Value) (err error) {
 					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, data, data)
 				}
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error [%s] with file [%s] field name [%s]\n", err, curVal[6:], sfld.Name)
-					os.Exit(1)
+					return fmt.Errorf("Error [%s] with file [%s] field name [%s]", err, curVal[6:], sfld.Name)
 				}
 				vfld.SetString(string(data))
 			}
 		}
+		//// TODO - TODO - add in recursive setting - xyzzy0001
+		// } else if kind == reflect.Struct && ...
+		// } else if kind == Pointers?
+		// } else if kind == Maps?
+		// } else if kind == Array?
+		// } else if kind == Slice?
 	}
 
 	return nil
@@ -242,7 +302,7 @@ func SetFromEnv(s interface{}) (err error) {
 
 	// Make sure we now have a struct
 	if typ.Kind() != reflect.Struct {
-		return fmt.Errorf("SetFromEnv was not passed a struct.\n")
+		return fmt.Errorf("SetFromEnv was not passed a struct.")
 	}
 
 	// Can we set values?
@@ -251,64 +311,11 @@ func SetFromEnv(s interface{}) (err error) {
 			fmt.Printf("Debug: We can set values.\n")
 		}
 	} else {
-		return fmt.Errorf("SetFromEnv passed a struct that will not allow setting of values\n")
+		return fmt.Errorf("SetFromEnv passed a struct that will not allow setting of values")
 	}
 
-	// PJS - new
 	return setFromEnv2(typ, val)
 
-	//old	// The number of fields in the struct is determined by the type of struct
-	//old	// it is. Loop through them.
-	//old	for i := 0; i < typ.NumField(); i++ {
-	//old
-	//old		// Get the type of the field from the type of the struct. For a struct, you always get a StructField.
-	//old		sfld := typ.Field(i)
-	//old
-	//old		// Get the type of the StructField, which is the type actually stored in that field of the struct.
-	//old		tfld := sfld.Type
-	//old
-	//old		// Get the Kind of that type, which will be the underlying base type
-	//old		// used to define the type in question.
-	//old		kind := tfld.Kind()
-	//old
-	//old		// Get the value of the field from the value of the struct.
-	//old		vfld := val.Field(i)
-	//old
-	//old		// Dump out what we've found
-	//old		if db2 {
-	//old			fmt.Printf("Debug: struct field %d: name %s type %s kind %s value %v\n", i, sfld.Name, tfld, kind, vfld)
-	//old		}
-	//old
-	//old		// Is that field some kind of string, and is the value one we can set?
-	//old		// 1. Other tyeps (all ints, floats) - not just strings		xyzzy001-type
-	//old		if kind == reflect.String && vfld.CanSet() {
-	//old			if db2 {
-	//old				fmt.Printf("Debug: Looking to set field %s\n", sfld.Name)
-	//old			}
-	//old			// Assign to it
-	//old			curVal := fmt.Sprintf("%s", vfld)
-	//old			if len(curVal) > 5 && curVal[0:5] == "$ENV$" {
-	//old				envVal := os.Getenv(curVal[5:])
-	//old				if db2 {
-	//old					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, curVal, envVal)
-	//old				}
-	//old				vfld.SetString(envVal)
-	//old			}
-	//old			if len(curVal) > 6 && curVal[0:6] == "$FILE$" {
-	//old				data, err := ioutil.ReadFile(curVal[6:])
-	//old				if db2 {
-	//old					fmt.Printf("Debug: Overwriting field %s current [%s] with [%s]\n", sfld.Name, data, data)
-	//old				}
-	//old				if err != nil {
-	//old					fmt.Fprintf(os.Stderr, "Error [%s] with file [%s] field name [%s]\n", err, curVal[6:], sfld.Name)
-	//old					os.Exit(1)
-	//old				}
-	//old				vfld.SetString(string(data))
-	//old			}
-	//old		}
-	//old	}
-	//old
-	//old	return nil
 }
 
 // Exists returns true if a directory or file exists.

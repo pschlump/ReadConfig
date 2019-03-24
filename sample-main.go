@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/American-Certified-Brands/config-sample/ReadConfig"
+	"./ReadConfig"
+
 	"github.com/pschlump/godebug"
 )
 
