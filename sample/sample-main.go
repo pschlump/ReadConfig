@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"./ReadConfig"
-
-	"github.com/pschlump/godebug"
+	"github.com/pschlump/ReadConfig"
+	"github.com/pschlump/dbgo"
 )
 
 // GlobalConfigData is the gloal configuration data.
@@ -24,5 +23,5 @@ func main() {
 		fmt.Printf("Error: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("SUCCESS: read %s\n", godebug.SVarI(gCfg))
+	fmt.Printf("SUCCESS: read %s\n", dbgo.SVarI(gCfg))
 }
