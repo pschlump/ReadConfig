@@ -12,7 +12,6 @@ github.com/mattn/go-isatty v0.0.5/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hd
 github.com/mattn/go-isatty v0.0.14 h1:yVuAays6BHfxijgZPzw+3Zlu5yQgKGP2/hcQbHb7S9Y=
 github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27kJ6hsGG94=
 github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b/go.mod h1:01TrycV0kFyexm33Z7vhZRXopbI8J3TDReVlkTgMUxE=
-github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d/go.mod h1:01TrycV0kFyexm33Z7vhZRXopbI8J3TDReVlkTgMUxE=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
@@ -20,7 +19,6 @@ github.com/pschlump/MiscLib v0.0.0-20171012162159-e4e6a3a34d5f/go.mod h1:5xTdUkC
 github.com/pschlump/MiscLib v1.0.1/go.mod h1:33BegrXglROGxpDvBSciKSCc1oEKj6oRgJWD5ZEX+ZI=
 github.com/pschlump/MiscLib v1.0.3 h1:2F7ZUkWJhBTIM7XaGb8L0bzO1l7jXi/lVFTRWXpElac=
 github.com/pschlump/MiscLib v1.0.3/go.mod h1:kNxJuPVgvnv69Yt9Dr6eQgShL4kK7elSA1Nz3/G2eBg=
-github.com/pschlump/ansi v1.0.0/go.mod h1:373N0n9TiAezgXGZ2duKwOV2GuTtVKyfHDz9SV0cSG8=
 github.com/pschlump/ansi v1.0.1 h1:NR7hBOgTV/shQwzwLmk4X/bVoUzvyIrwlB5k8wWnl7A=
 github.com/pschlump/ansi v1.0.1/go.mod h1:dwr2CQhjyMjSNA9wpCOux2+MhQiqoelfvBKkTYNBNuA=
 github.com/pschlump/dbgo v1.0.3 h1:YW+124ccToMXECiZ6RpBUC4yj3Kr6qL30Z0gEiHDykI=
@@ -33,10 +31,12 @@ github.com/pschlump/godebug v1.0.4/go.mod h1:0g877qgD7yUdH5NUqp6hg/QTvR0LLIBGpuk
 github.com/pschlump/json v0.0.0-20180316172947-0d2e6a308e08/go.mod h1:MyeKNxcsYS/AaCqIp6DgPdaE/4NVH49OJVCnQsRoevI=
 github.com/pschlump/json v1.12.0 h1:PjkeVEgEUg+vkHC8CfeXIG4fChev3a7gjl9wYrTnPIE=
 github.com/pschlump/json v1.12.0/go.mod h1:MyeKNxcsYS/AaCqIp6DgPdaE/4NVH49OJVCnQsRoevI=
+github.com/pschlump/json5 v1.0.0 h1:q0a4A7IxGjjIZtadQSc9A2mjtcDliiq9URz5OpXfY4s=
+github.com/pschlump/json5 v1.0.0/go.mod h1:RB/C8FaxSTWCqx9YosuDkgMOCNg8ukyEM8ncKms/+Kk=
 github.com/pschlump/jsonSyntaxErrorLib v1.0.1 h1:Tfc5nLlmyOfJc0Xtk70CU4F4q/AaAvnxK31+rWGUeLo=
 github.com/pschlump/jsonSyntaxErrorLib v1.0.1/go.mod h1:n13lHtoalG+X635RmkFZJQtlLN8qlP775ukxGtylXbk=
-github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f h1:wOVoULFf7IVSJ9hl8wnQew/kCpchffRb7a81H9/IcS4=
-github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f/go.mod h1:/mK7FZ3mFYEn9zvNPhpngTyatyehSwte5bJZ4ehL5Xw=
+github.com/robertkrimen/otto v0.0.0-20211024170158-b87d35c0b86f h1:a7clxaGmmqtdNTXyvrp/lVO/Gnkzlhc/+dLs5v965GM=
+github.com/robertkrimen/otto v0.0.0-20211024170158-b87d35c0b86f/go.mod h1:/mK7FZ3mFYEn9zvNPhpngTyatyehSwte5bJZ4ehL5Xw=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 golang.org/x/sys v0.0.0-20190222072716-a9d3bda3a223/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=

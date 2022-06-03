@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	json "git.q8s.co/pschlump/json5"
 	"github.com/fatih/structtag"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pschlump/dbgo"
+	json "github.com/pschlump/json5"
 	"github.com/pschlump/jsonSyntaxErrorLib"
 )
 
