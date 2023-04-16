@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/fatih/structtag v1.2.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/pschlump/dbgo v1.0.4
+	github.com/pschlump/dbgo v1.0.6
 	github.com/pschlump/json5 v1.0.0
 	github.com/pschlump/jsonSyntaxErrorLib v1.0.4
 )
