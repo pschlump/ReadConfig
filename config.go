@@ -239,6 +239,8 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 			// report errors - defauilt is only implemented with strings.
 			fmt.Fprintf(os.Stderr, "default tag on struct is only implemented for `string`, `int`, `uint`, `int64`, `bool` fields in struct.  Fatal error on %s tag %s\n", sfld.Name, tag)
 			os.Exit(1)
+		} else {
+			fmt.Fprintf(os.Stderr, "243: Invalid Type %v\n", kind)
 		}
 	}
 
@@ -385,6 +387,8 @@ func SetFromEnv2(typ reflect.Type, val reflect.Value) (err error) {
 				fmt.Printf("%sAT: %s%s\n", dbgo.ColorYellow, dbgo.LF(), dbgo.ColorReset)
 			}
 			recursiveSetFromEnv(vfld.Addr().Interface())
+		} else {
+			fmt.Fprintf(os.Stderr, "391: Invalid Type %v\n", kind)
 		}
 	}
 
@@ -486,6 +490,8 @@ func recursiveSetFromEnv(s interface{}) (err error) {
 				fmt.Printf("%sAT: %s%s\n", dbgo.ColorYellow, dbgo.LF(), dbgo.ColorReset)
 			}
 			recursiveSetFromEnv(vfld.Addr().Interface())
+		} else {
+			fmt.Fprintf(os.Stderr, "494: Invalid Type %v\n", kind)
 		}
 	}
 
@@ -586,6 +592,8 @@ func SetFromEnv(s interface{}) (err error) {
 				fmt.Printf("%sAT: %s%s\n", dbgo.ColorYellow, dbgo.LF(), dbgo.ColorReset)
 			}
 			recursiveSetFromEnv(vfld.Addr().Interface())
+		} else {
+			fmt.Fprintf(os.Stderr, "596: Invalid Type %v\n", kind)
 		}
 	}
 
@@ -804,6 +812,8 @@ func recursiveChildStruct(lCfg interface{}) error {
 			// report errors - defauilt is only implemented with strings.
 			fmt.Fprintf(os.Stderr, "default tag on struct is only implemented for `string`, `int`, `uint`, `int64`, `bool` fields in struct.  Fatal error on %s tag %s\n", sfld.Name, tag)
 			os.Exit(1)
+		} else {
+			fmt.Fprintf(os.Stderr, "816: Invalid Type %v\n", kind)
 		}
 	}
 	if db3 {
