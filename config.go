@@ -240,7 +240,7 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 			fmt.Fprintf(os.Stderr, "default tag on struct is only implemented for `string`, `int`, `uint`, `int64`, `bool` fields in struct.  Fatal error on %s tag %s\n", sfld.Name, tag)
 			os.Exit(1)
 		} else {
-			fmt.Fprintf(os.Stderr, "243: Invalid Type %v\n", kind)
+			fmt.Fprintf(os.Stderr, "ReadConfig/config.go Line:243: Invalid Type %v\n", kind)
 		}
 	}
 
@@ -388,7 +388,7 @@ func SetFromEnv2(typ reflect.Type, val reflect.Value) (err error) {
 			}
 			recursiveSetFromEnv(vfld.Addr().Interface())
 		} else {
-			fmt.Fprintf(os.Stderr, "391: Invalid Type %v\n", kind)
+			fmt.Fprintf(os.Stderr, "ReadConfig/config.go Line:392: Invalid Type %v\n", kind)
 		}
 	}
 
