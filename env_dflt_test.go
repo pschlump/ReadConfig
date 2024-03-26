@@ -25,7 +25,7 @@ type Test2TypeDflt struct {
 
 func TestEnvWithDefault(t *testing.T) {
 
-	dbgo.DbPfb(db8, "--------------- New test -------------------\n")
+	dbgo.DbPfb(db18, "--------------- New test -------------------\n")
 
 	tests := []struct {
 		SetEnvName string
@@ -59,7 +59,7 @@ func TestEnvWithDefault(t *testing.T) {
 	for ii, test := range tests {
 		os.Setenv(test.SetEnvName, test.SetEnvVal)
 		ReadFile(test.FileName, &test2)
-		dbgo.DbPfb(db8, "Result: %s\n", dbgo.SVarI(test2))
+		dbgo.DbPfb(db18, "Result: %s\n", dbgo.SVarI(test2))
 		got := dbgo.SVarI(test2)
 		if got != test.Expected {
 			t.Errorf("Test %d, expected %s got %s\n", ii, test.Expected, got)
@@ -68,4 +68,4 @@ func TestEnvWithDefault(t *testing.T) {
 
 }
 
-const db8 = false
+const db18 = false

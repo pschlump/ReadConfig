@@ -17,8 +17,8 @@ import (
 	"github.com/pschlump/jsonSyntaxErrorLib"
 )
 
-// TODO
-// DBSSLMode   string `json:"db_sslmode" default:"$ENV$PG_SSLMODE=disable"`
+// TODO DBSSLMode   string `json:"db_sslmode" default:"$ENV$PG_SSLMODE=disable"`
+// xyzzyMissingType, Todo include map data type.
 
 func PrefixOptionReadConfdig(prefix *string, filename string, lCfg interface{}) (err error) {
 	tmp_fn := "/tmp/cfg.json"
@@ -240,7 +240,9 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 			fmt.Fprintf(os.Stderr, "default tag on struct is only implemented for `string`, `int`, `uint`, `int64`, `bool` fields in struct.  Fatal error on %s tag %s\n", sfld.Name, tag)
 			os.Exit(1)
 		} else {
-			fmt.Fprintf(os.Stderr, "ReadConfig/config.go Line:243: Invalid Type %v\n", kind)
+			if db8 {
+				fmt.Fprintf(os.Stderr, "ReadConfig/config.go Line:243: Invalid Type %v\n", kind) // xyzzyMissingType
+			}
 		}
 	}
 
@@ -388,7 +390,9 @@ func SetFromEnv2(typ reflect.Type, val reflect.Value) (err error) {
 			}
 			recursiveSetFromEnv(vfld.Addr().Interface())
 		} else {
-			fmt.Fprintf(os.Stderr, "ReadConfig/config.go Line:392: Invalid Type %v\n", kind)
+			if db8 {
+				fmt.Fprintf(os.Stderr, "ReadConfig/config.go Line:392: Invalid Type %v\n", kind) // xyzzyMissingType
+			}
 		}
 	}
 
@@ -491,7 +495,9 @@ func recursiveSetFromEnv(s interface{}) (err error) {
 			}
 			recursiveSetFromEnv(vfld.Addr().Interface())
 		} else {
-			fmt.Fprintf(os.Stderr, "494: Invalid Type %v\n", kind)
+			if db8 {
+				fmt.Fprintf(os.Stderr, "ReadConfig/config.go 494: Invalid Type %v\n", kind) // xyzzyMissingType
+			}
 		}
 	}
 
@@ -865,3 +871,6 @@ var db2 = false
 var db7 = false
 var db3 = false
 var db4 = false
+
+// xyzzyMissingType, Todo include map data type.
+const db8 = false // missing types
