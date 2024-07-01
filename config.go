@@ -811,15 +811,25 @@ func recursiveChildStruct(lCfg interface{}) error {
 				fmt.Printf("%sProbably an error - can not set - AT: %s%s\n", dbgo.ColorRed, dbgo.LF(), dbgo.ColorReset)
 				panic("recursive-oopsy")
 			}
+		} else if kind == reflect.Map {
+			if db5 {
+				dbgo.Fprintf(os.Stderr, "%(red)%(LF)%(reset): Invalid Type %v, field %s - no defaults\n", kind, sfld.Name)
+			}
+		} else if kind == reflect.Slice {
+			if db5 {
+				dbgo.Fprintf(os.Stderr, "%(red)%(LF)%(reset): Invalid Type %v, field %s - no defaults\n", kind, sfld.Name)
+			}
 		} else if kind != reflect.String && err == nil {
 			if db3 {
-				fmt.Printf("%sAT: %s%s\n", dbgo.ColorCyan, dbgo.LF(), dbgo.ColorReset)
+				dbgo.Printf("%(red)%(LF)%s, %s\n", sfld.Name, tag)
 			}
 			// report errors - defauilt is only implemented with strings.
 			fmt.Fprintf(os.Stderr, "default tag on struct is only implemented for `string`, `int`, `uint`, `int64`, `bool` fields in struct.  Fatal error on %s tag %s\n", sfld.Name, tag)
 			os.Exit(1)
 		} else {
-			fmt.Fprintf(os.Stderr, "816: Invalid Type %v\n", kind)
+			if db5 {
+				dbgo.Fprintf(os.Stderr, "%(red)%(LF)%(reset): Invalid Type %v, field %s\n", kind, sfld.Name)
+			}
 		}
 	}
 	if db3 {
@@ -871,6 +881,8 @@ var db2 = false
 var db7 = false
 var db3 = false
 var db4 = false
+
+var db5 = true
 
 // xyzzyMissingType, Todo include map data type.
 const db8 = false // missing types
