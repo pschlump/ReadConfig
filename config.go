@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -876,13 +877,22 @@ func StripPrefix(prefix, key string) string {
 	return ""
 }
 
+var commentMatch *regexp.Regexp = regexp.MustCompile(`//.*$`)
+
+// Will not work, has to parse JSON and look for strings, '.*', ".*" and process escapes, then look for comments.
+func ReadAndRemoveComents(fn string) (buf []byte, err error) {
+	buf, err = ioutil.ReadFile(fn)
+	buf = commentMatch.ReplaceAll(buf, []byte(""))
+	return
+}
+
 var db1 = false
 var db2 = false
 var db7 = false
 var db3 = false
 var db4 = false
 
-var db5 = true
+var db5 = false
 
 // xyzzyMissingType, Todo include map data type.
 const db8 = false // missing types
