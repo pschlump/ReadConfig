@@ -18,7 +18,8 @@ import (
 	"github.com/pschlump/jsonSyntaxErrorLib"
 )
 
-// TODO DBSSLMode   string `json:"db_sslmode" default:"$ENV$PG_SSLMODE=disable"`
+// TODO DBSSLMode   string `json:"db_sslmode" default:"$ETCD$/key/path/key"`
+
 // xyzzyMissingType, Todo include map data type.
 
 func PrefixOptionReadConfdig(prefix *string, filename string, lCfg interface{}) (err error) {
