@@ -14,6 +14,7 @@ import (
 	"github.com/fatih/structtag"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pschlump/dbgo"
+	"github.com/pschlump/filelib"
 	json "github.com/pschlump/json5"
 	"github.com/pschlump/jsonSyntaxErrorLib"
 )
@@ -268,12 +269,26 @@ func ReadFile(filename string, lCfg interface{}) (err error) {
 		fmt.Printf("Debug: File name after checing ~/local [%s]\n", filename)
 	}
 
-	var buf []byte
-	buf, err = ioutil.ReadFile(filename)
+	/*
+		var buf []byte
+		buf, err = ioutil.ReadFile(filename)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to read the JSON file [%s]: error %s\n", filename, err)
+			os.Exit(1)
+		}
+	*/
+
+	// --------------------------------------------------------------------------------------------------
+	// Remove comments from file.  Comments are /* ... */ (not nested) and //.*\n,
+	//	Must support '.*' and ".*" strings.
+	// --------------------------------------------------------------------------------------------------
+	fp, err := filelib.Fopen(filename, "r")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to read the JSON file [%s]: error %s\n", filename, err)
+		fmt.Fprintf(os.Stderr, "Unable to open %s for input: %s\n", filename, err)
 		os.Exit(1)
 	}
+	defer fp.Close()
+	buf, err := StripComments(fp)
 
 	// err = json.Unmarshal(buf, &gCfg)
 	err = json.Unmarshal(buf, lCfg)
