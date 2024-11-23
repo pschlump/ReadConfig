@@ -31,12 +31,25 @@ func PrefixOptionReadConfdig(prefix *string, filename string, lCfg interface{}) 
 	} else {
 		tmp := make(map[string]interface{})
 
-		var buf []byte
-		buf, err = ioutil.ReadFile(filename)
+		/*
+			var buf []byte
+			buf, err = ioutil.ReadFile(filename)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Unable to read the JSON file [%s]: error %s\n", filename, err)
+				os.Exit(1)
+			}
+		*/
+		// --------------------------------------------------------------------------------------------------
+		// Remove comments from file.  Comments are /* ... */ (not nested) and //.*\n,
+		//	Must support '.*' and ".*" strings.
+		// --------------------------------------------------------------------------------------------------
+		fp, err := filelib.Fopen(filename, "r")
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to read the JSON file [%s]: error %s\n", filename, err)
+			fmt.Fprintf(os.Stderr, "Unable to open %s for input: %s\n", filename, err)
 			os.Exit(1)
 		}
+		defer fp.Close()
+		buf, err := StripComments(fp)
 
 		err = json.Unmarshal(buf, &tmp)
 		if err != nil {

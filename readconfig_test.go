@@ -172,6 +172,20 @@ func Test3(t *testing.T) {
 			FileName:   "./testdata/test2.json",
 			Expected:   "%s/.keystore",
 		},
+		{
+			me:         true,
+			SetEnvName: "homeTest",
+			SetEnvVal:  "~pschlump/.keystore",
+			FileName:   "./testdata/test3.json",
+			Expected:   "%s/.keystore",
+		},
+		{
+			me:         true,
+			SetEnvName: "homeTest",
+			SetEnvVal:  "~pschlump/.keystore",
+			FileName:   "./testdata/test4.json",
+			Expected:   "%s/.keystore",
+		},
 	}
 
 	db1 = false // turn on output for debuging in ReadFile
